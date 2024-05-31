@@ -30,8 +30,7 @@ if __name__ == '__main__':
 
     # lung mask of the Atlas image
     fixed_img = "./Patient_0111262324_Study_CT_CHEST_WITHOUT_CONTRAST_42526394_Series_2_DR_30_0.625_Reg_mask.nii.gz"
-    if not os.path.exists(fixed_img):
-        clamp_img("./lung_mask_atlas/"+fixed_img.split('/')[-1])
+    assert os.path.exists(fixed_img)
 
     for idx, line in enumerate(moving_img_list):
         #if idx % 8 != args.batch_index: # batch
