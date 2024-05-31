@@ -8,9 +8,12 @@ from joblib import Parallel, delayed
 LOW_THRESHOLD = -1024
 HIGH_THRESHOLD = 600
 NUM_JOB = 2
+RAW_IMAGE_FOLDER = "./nii_raw/"
+OUTPUT_FOLDER = "./moved_img_256/"
 
 def sub_job(batch_index):
-    moving_img_list = list(glob.glob("./nii_raw/*.nii.gz"))
+    # Input raw images
+    moving_img_list = list(glob.glob(RAW_IMAGE_FOLDER+"/*.nii.gz"))
 
     fixed_img = "../RAD_ChestCT/clamped_mask/Patient_0111262324_Study_CT_CHEST_WITHOUT_CONTRAST_42526394_Series_2_DR_30_0.625_Reg.nii.gz"
 
@@ -25,7 +28,7 @@ def sub_job(batch_index):
             print(moving_img)
             continue
             
-        warped_img = "./moved_img_256/"+subject_id+"_Reg.nii.gz"
+        warped_img = OUTPUT_FOLDER + "/"+subject_id+"_Reg.nii.gz"
 
         run_result = os.system("antsApplyTransforms -d 3 -i "+moving_img+" -r "+fixed_img+\
                      " -o "+warped_img+" -n Linear -t "+transform+" -f -1024")

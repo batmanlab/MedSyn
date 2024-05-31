@@ -6,9 +6,8 @@ The data preprocessing pipeline consists of six steps, listed as following:
 
 ```bash
 python 1_seg_lung.py --img_folder path_to/
-                           --result_folder  path_to/
 ```
-
+The ``Patient_0111262324_Study_CT_CHEST_WITHOUT_CONTRAST_42526394_Series_2_DR_30_0.625_Reg_mask.nii.gz`` file is the lung mask of the Atlas image.
 We use [lungmask](https://github.com/JoHof/lungmask) to segment lung.
 
 ### Step 2: Run registration

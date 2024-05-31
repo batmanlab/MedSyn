@@ -16,13 +16,19 @@ def clamp_img(img_path):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--batch_index', type=int)
+    #parser.add_argument('--batch_index', type=int)
     args = parser.parse_args()
     #assert args.batch_index != None
-    print("Batch index:", args.batch_index)
+    #print("Batch index:", args.batch_index)
+    
+    # create output folders
+    os.makedirs("./image_mask/", exist_ok = True)
+    os.makedirs("./transform_mask/", exist_ok = True)
+    os.makedirs("./clamped_mask/", exist_ok = True)
 
     moving_img_list = list(glob.glob("./lung_mask_raw/*.nii.gz"))
 
+    # lung mask of the Atlas image
     fixed_img = "./Patient_0111262324_Study_CT_CHEST_WITHOUT_CONTRAST_42526394_Series_2_DR_30_0.625_Reg_mask.nii.gz"
     if not os.path.exists(fixed_img):
         clamp_img("./lung_mask_atlas/"+fixed_img.split('/')[-1])
