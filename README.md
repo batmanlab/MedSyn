@@ -24,7 +24,7 @@ Refer to the training folder
 # Comparisons
 
 <p align="center">
-  <img width="75%" height="%75" src="https://github.com/batmanlab/twin_ac/blob/master/figure/overlap_MNIST.png](https://github.com/batmanlab/MedSyn/blob/main/figure/visualize_slice_v3.pdf">
+  <img width="75%" height="%75" src="https://github.com/batmanlab/MedSyn/blob/main/figure/visualize_slice_v3.pdf">
 </p>
 
 # Generation Conditioned on Reports
@@ -38,3 +38,15 @@ Refer to the training folder
 <p align="center">
   <img width="75%" height="%75" src="https://github.com/batmanlab/MedSyn/blob/main/figure/marginalization.pdf">
 </p>
+
+
+# If you find this repo useful please cite below:
+
+```
+@ARTICLE{10566053,
+  author={Xu, Yanwu and Sun, Li and Peng, Wei and Jia, Shuyue and Morrison, Katelyn and Perer, Adam and Zandifar, Afrooz and Visweswaran, Shyam and Eslami, Motahhare and Batmanghelich, Kayhan},
+  journal={IEEE Transactions on Medical Imaging}, 
+  title={MedSyn: Text-guided Anatomy-aware Synthesis of High-Fidelity 3D CT Images}, 
+  year={2024},
+  doi={10.1109/TMI.2024.3415032}}
+```
