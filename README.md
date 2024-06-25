@@ -29,6 +29,8 @@ Refer to the training folder
 
 # Generation Conditioned on Reports
 
+![](figure/prompt_comparison.pdf)
+
 <p align="center">
   <img width="75%" height="%75" src="https://github.com/batmanlab/MedSyn/blob/main/figure/prompt_comparison.pdf">
 </p>
