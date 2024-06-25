@@ -10,3 +10,10 @@ Refer to the preprocessing folder
 # Training and Inference
 
 Refer to the training folder
+
+# Generated Examples
+
+
+| Low-Res|  High-Res
+:-------------------------:|:-------------------------:
+![](MOG/tac_gif_1D/o.gif)  |  ![](MOG/tac_gif_1D/twin_ac.gif)
