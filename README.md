@@ -24,7 +24,7 @@ Refer to the training folder
 # Comparisons
 
 <p align="center">
-  <img width="30%" height="%30" src="https://github.com/batmanlab/MedSyn/blob/main/figure/visualize_slice_v3.pdf">
+  <img width="75%" height="%75" src="https://github.com/batmanlab/MedSyn/blob/main/figure/visualize_slice_v3.pdf">
 </p>
 
 # Generation Conditioned on Reports
