@@ -1268,7 +1268,7 @@ diffusion_model = GaussianDiffusion(
 )
 
 trainer = Trainer(diffusion_model=diffusion_model,
-                  folder="./results/img_64_standard_bulk/",
+                  folder="Your Path of Saving Low-Res Volume",
                   ema_decay=0.995,
                   num_frames=64,
                   train_batch_size=1,
@@ -1279,8 +1279,8 @@ trainer = Trainer(diffusion_model=diffusion_model,
                   step_start_ema=10000,
                   update_ema_every=10,
                   save_and_sample_every=1000,
-                  results_folder='/ocean/projects/asc170022p/yanwuxu/diffusion/video-diffusion-pytorch/video_diffusion_pytorch/results_SR_gaussian_aug_full_volume_seg',
-                  save_folder='./results/img_256_standard_bulk/',
+                  results_folder='Your Path of Saving high-res Logs',
+                  save_folder='Your Path of Saving final high-res Imgs',
                   num_sample_rows=1,
                   max_grad_norm=1.0)
 
