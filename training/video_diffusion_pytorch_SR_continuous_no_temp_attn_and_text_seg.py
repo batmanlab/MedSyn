@@ -1374,7 +1374,7 @@ diffusion_model = GaussianDiffusion(
 )
 
 trainer = Trainer(diffusion_model=diffusion_model,
-                  folder="/ocean/projects/asc170022p/lisun/r3/results/moved_img_npy_256",
+                  folder="Your Data Path",
                   ema_decay=0.995,
                   num_frames=64,
                   train_batch_size=1,
@@ -1385,7 +1385,7 @@ trainer = Trainer(diffusion_model=diffusion_model,
                   step_start_ema=10000,
                   update_ema_every=10,
                   save_and_sample_every=1000,
-                  results_folder='./results_SR_gaussian_aug_full_volume_seg',
+                  results_folder='Your Logs Saving Path',
                   num_sample_rows=1,
                   max_grad_norm=1.0)
 
