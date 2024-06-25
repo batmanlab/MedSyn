@@ -21,8 +21,20 @@ Refer to the training folder
 ![](figure/low_res/40017881_Reg.gif)  |  ![](figure/high_res/40017881_Reg.gif)
 ![](figure/low_res/40019171_Reg.gif)  |  ![](figure/high_res/40019171_Reg.gif)
 
-# Comparison
+# Comparisons
 
 <p align="center">
-  <img width="75%" height="%75" src="https://github.com/batmanlab/twin_ac/blob/master/figure/overlap_MNIST.png">
+  <img width="75%" height="%75" src="https://github.com/batmanlab/twin_ac/blob/master/figure/overlap_MNIST.png](https://github.com/batmanlab/MedSyn/blob/main/figure/visualize_slice_v3.pdf">
+</p>
+
+# Generation Conditioned on Reports
+
+<p align="center">
+  <img width="75%" height="%75" src="https://github.com/batmanlab/MedSyn/blob/main/figure/prompt_comparison.pdf">
+</p>
+
+# Generation Conditioned on Segmentation Mask
+
+<p align="center">
+  <img width="75%" height="%75" src="https://github.com/batmanlab/MedSyn/blob/main/figure/marginalization.pdf">
 </p>
