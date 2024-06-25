@@ -17,3 +17,9 @@ Refer to the training folder
 | Low-Res|  High-Res
 :-------------------------:|:-------------------------:
 ![](figure/low_res/40004330_Reg.gif)  |  ![](figure/high_res/40004330_Reg.gif)
+:-------------------------:|:-------------------------:
+![](figure/low_res/40013558_Reg.gif)  |  ![](figure/high_res/40013558_Reg.gif)
+:-------------------------:|:-------------------------:
+![](figure/low_res/40017881_Reg.gif)  |  ![](figure/high_res/40017881_Reg.gif)
+:-------------------------:|:-------------------------:
+![](figure/low_res/40019171_Reg.gif)  |  ![](figure/high_res/40019171_Reg.gif)
