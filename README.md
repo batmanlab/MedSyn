@@ -20,3 +20,9 @@ Refer to the training folder
 ![](figure/low_res/40013558_Reg.gif)  |  ![](figure/high_res/40013558_Reg.gif)
 ![](figure/low_res/40017881_Reg.gif)  |  ![](figure/high_res/40017881_Reg.gif)
 ![](figure/low_res/40019171_Reg.gif)  |  ![](figure/high_res/40019171_Reg.gif)
+
+# Comparison
+
+<p align="center">
+  <img width="75%" height="%75" src="https://github.com/batmanlab/twin_ac/blob/master/figure/overlap_MNIST.png">
+</p>
