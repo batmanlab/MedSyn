@@ -1,3 +1,7 @@
+# Create the MedSyn Conda Enviroment
+```
+conda env create -f medsyn.txt
+```
 # Training and Inference of MedSyn
 
 We offer a one-key running bash, listed as follows:
