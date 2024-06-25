@@ -16,4 +16,4 @@ Refer to the training folder
 
 | Low-Res|  High-Res
 :-------------------------:|:-------------------------:
-![](MOG/tac_gif_1D/o.gif)  |  ![](MOG/tac_gif_1D/twin_ac.gif)
+![](figure/low_res/40004330_Reg.gif)  |  ![](figure/high_res/40004330_Reg.gif)
