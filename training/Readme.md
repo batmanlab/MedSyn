@@ -1,8 +1,8 @@
-# Pre-process Data for training MedSyn
+# Training and Inference of MedSyn
 
-The data preprocessing pipeline consists of six steps, listed as following:
+The training consists of 2 steps, listed as follows:
 
-### Step 1: Segment lung from CT scans, because we use lung mask for registration
+### Step 1: Training the text-conditioned low-res Unet
 
 ```bash
 python 1_seg_lung.py --img_folder path_to/
