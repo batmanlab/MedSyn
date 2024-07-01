@@ -1,19 +1,17 @@
-# Create the MedSyn Conda Enviroment
+# Create the MedSyn Conda environment
 ```
 conda env create -f medsyn.txt
 ```
-# Training and Inference of MedSyn
-
-We offer a one-key running bash, listed as follows:
-
-### Step 1: Training the text-conditioned low-res and the high-res Unet
+# Training of MedSyn
 This is a one-key running bash, which will run both low-res and high-res. But the training can be done independently
 ```bash
 sh run_R3.sh
 ```
 
-### Step 2: Running inference
+# Running inference
 
 ```bash
-python 2_run_registration.py
+sh inf_R3.sh
 ```
+
+Our model pre-trained on UPMC dataset is available [here](https://drive.google.com/file/d/1AAlEN_dB7C0aVMJ81mKBlYnSqMVOk-tl/) (Application required).
