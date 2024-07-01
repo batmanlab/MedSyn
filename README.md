@@ -24,19 +24,19 @@ Refer to the training folder
 # Comparisons
 
 <p align="center">
-  <img width="75%" height="%75" src="figure/visualize_slice_v3.pdf">
+  <img width="75%" height="%75" src="figure/visualize_slice_v3.jpg">
 </p>
 
 # Generation Conditioned on Reports
 
 <p align="center">
-  <img width="75%" height="%75" src="https://github.com/batmanlab/MedSyn/blob/main/figure/prompt_comparison.pdf">
+  <img width="75%" height="%75" src="figure/prompt_comparison.jpg">
 </p>
 
 # Generation Conditioned on Segmentation Mask
 
 <p align="center">
-  <img width="75%" height="%75" src="https://github.com/batmanlab/MedSyn/blob/main/figure/marginalization.pdf">
+  <img width="75%" height="%75" src="figure/marginalization.jpg">
 </p>
 
 
