@@ -16,4 +16,4 @@ Refer to `./extract_text_feature/extract_text_feature.ipynb`
 sh run_inference.sh
 ```
 
-Our model pre-trained on UPMC dataset is available [here](https://drive.google.com/file/d/1AAlEN_dB7C0aVMJ81mKBlYnSqMVOk-tl/) (Application required).
+Our checkpoint for model pre-trained on UPMC dataset is available [here](https://drive.google.com/file/d/1AAlEN_dB7C0aVMJ81mKBlYnSqMVOk-tl/) (Application required).

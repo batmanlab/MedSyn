@@ -4,7 +4,7 @@ Official PyTorch implementation for paper *MedSyn: Text-guided Anatomy-aware Syn
 ### [[Paper](https://arxiv.org/abs/2310.03559)] [[Project](https://batmanlab.github.io/medsyn.github.io/)]
 
 <p align="center">
-  <img width="60%" height="%60" src="figure/schematic.jpg">
+  <img width="70%" height="%70" src="figure/schematic.jpg">
 </p>
 
 # Data Preprocessing
@@ -44,7 +44,7 @@ Refer to the `src` folder
 </p>
 
 
-# If you find this repo useful please cite below:
+# Citation
 
 ```
 @ARTICLE{medsyn2024,
