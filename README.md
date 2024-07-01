@@ -1,15 +1,19 @@
 # MedSyn
-This repository is by  [Yanwu Xu](http://xuyanwu.github.io) and [Li Sun](https://lisun-ai.github.io/)
-and contains the [PyTorch](https://pytorch.org) source code to
-reproduce the experiments in our TMI paper [MedSyn: Text-guided Anatomy-aware Synthesis of High-Fidelity 3D CT Images](https://arxiv.org/abs/2310.03559).
+Official PyTorch implementation for paper *MedSyn: Text-guided Anatomy-aware Synthesis of High-Fidelity 3D CT Images*, accepted by *IEEE Transactions on Medical Imaging*.
+
+### [[Paper](https://arxiv.org/abs/2310.03559)] [[Project](https://batmanlab.github.io/medsyn.github.io/)]
+
+<p align="center">
+  <img width="60%" height="%60" src="figure/schematic.jpg">
+</p>
 
 # Data Preprocessing
 
-Refer to the preprocessing folder
+Refer to the `preprocess` folder
 
 # Training and Inference
 
-Refer to the training folder
+Refer to the `src` folder
 
 # Generated Examples
 
@@ -43,7 +47,7 @@ Refer to the training folder
 # If you find this repo useful please cite below:
 
 ```
-@ARTICLE{10566053,
+@ARTICLE{medsyn2024,
   author={Xu, Yanwu and Sun, Li and Peng, Wei and Jia, Shuyue and Morrison, Katelyn and Perer, Adam and Zandifar, Afrooz and Visweswaran, Shyam and Eslami, Motahhare and Batmanghelich, Kayhan},
   journal={IEEE Transactions on Medical Imaging}, 
   title={MedSyn: Text-guided Anatomy-aware Synthesis of High-Fidelity 3D CT Images}, 
