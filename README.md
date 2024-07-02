@@ -7,16 +7,37 @@ Official PyTorch implementation for paper *MedSyn: Text-guided Anatomy-aware Syn
   <img width="70%" height="%70" src="figure/schematic.jpg">
 </p>
 
-# Data Preprocessing
+## Table of Contents
+
+1. [Environment Setup](#environment-setup)
+2. [Pre-processing Data](#pre-processing-data)
+3. [Training](#training)
+4. [Inference](#inference)
+5. [Additional Scripts](#additional-scripts)
+6. [Generated Samples](#generated-samples)
+7. [Citation](#citation)
+8. [License and Copyright](#license-and-copyright)
+9. [Contact](#contact)
+
+## Environment Setup
+
+## Pre-processing Data
 
 Refer to the `preprocess` folder
 
-# Training and Inference
+## Training
 
 Refer to the `src` folder
 
-# Generated Examples
+## Training
 
+Refer to the `src` folder
+
+## Inference
+
+## Additional Scripts
+
+## Generated Samples
 
 | Low-Res|  High-Res
 :-------------------------:|:-------------------------:
@@ -25,26 +46,26 @@ Refer to the `src` folder
 ![](figure/low_res/40017881_Reg.gif)  |  ![](figure/high_res/40017881_Reg.gif)
 ![](figure/low_res/40019171_Reg.gif)  |  ![](figure/high_res/40019171_Reg.gif)
 
-# Comparisons
+### Comparisons
 
 <p align="center">
   <img width="75%" height="%75" src="figure/visualize_slice_v3.jpg">
 </p>
 
-# Generation Conditioned on Reports
+### Generation Conditioned on Reports
 
 <p align="center">
   <img width="75%" height="%75" src="figure/prompt_comparison.jpg">
 </p>
 
-# Generation Conditioned on Segmentation Mask
+### Generation Conditioned on Segmentation Mask
 
 <p align="center">
   <img width="75%" height="%75" src="figure/marginalization.jpg">
 </p>
 
 
-# Citation
+## Citation
 
 ```
 @ARTICLE{medsyn2024,
@@ -54,3 +75,7 @@ Refer to the `src` folder
   year={2024},
   doi={10.1109/TMI.2024.3415032}}
 ```
+
+## License and Copyright
+
+## Contact
