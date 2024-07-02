@@ -21,6 +21,8 @@ Official PyTorch implementation for paper *MedSyn: Text-guided Anatomy-aware Syn
 
 ## Environment Setup
 
+Refer to the `src` folder
+
 ## Pre-processing Data
 
 Refer to the `preprocess` folder
@@ -29,11 +31,9 @@ Refer to the `preprocess` folder
 
 Refer to the `src` folder
 
-## Training
+## Inference
 
 Refer to the `src` folder
-
-## Inference
 
 ## Additional Scripts
 
