@@ -22,11 +22,17 @@ Official PyTorch implementation for paper *MedSyn: Text-guided Anatomy-aware Syn
 
 ## Environment Setup
 
-Refer to the `src` folder
+Refer to the `src` folder 
+
+```
+conda env create -f environment.yml
+```
 
 ## Pretrained Checkpoint
 
 Refer to the `src` folder
+
+Our checkpoint for model pre-trained on UPMC dataset is available [here](https://drive.google.com/file/d/1AAlEN_dB7C0aVMJ81mKBlYnSqMVOk-tl/) (Application required).
 
 ## Pre-processing Data
 
@@ -36,9 +42,16 @@ Refer to the `preprocess` folder
 
 Refer to the `src` folder
 
+This is a one-key running bash, which will run both low-res and high-res. But the training can be done independently
+```bash
+sh run_train.sh
+```
+
 ## Inference
 
 Refer to the `src` folder
+
+`./extract_text_feature/extract_text_feature.ipynb`
 
 ## Additional Scripts
 
