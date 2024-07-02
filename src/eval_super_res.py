@@ -617,47 +617,9 @@ class GaussianDiffusion(nn.Module):
         self.use_dynamic_thres = use_dynamic_thres
         self.dynamic_thres_percentile = dynamic_thres_percentile
 
-    def q_mean_variance(self, x_start, t):
-        mean = extract(self.sqrt_alphas_cumprod, t, x_start.shape) * x_start
-        variance = extract(1. - self.alphas_cumprod, t, x_start.shape)
-        log_variance = extract(self.log_one_minus_alphas_cumprod, t, x_start.shape)
-        return mean, variance, log_variance
-
-    def predict_start_from_noise(self, x_t, t, noise):
-        x_t = rearrange(x_t, "b c f h w -> (b f) c h w")
-        noise = rearrange(noise, "b c f h w -> (b f) c h w")
-        t = rearrange(t, "b f -> (b f)")
-
-        out = (extract(self.sqrt_recip_alphas_cumprod, t, x_t.shape) * x_t -
-               extract(self.sqrt_recipm1_alphas_cumprod, t, x_t.shape) * noise)
-
-        out = rearrange(out, "(b f) c h w-> b c f h w ", f=self.num_frames)
-        return out
-
-    def q_posterior(self, x_start, x_t, t):
-        x_t = rearrange(x_t, "b c f h w -> (b f) c h w")
-        x_start = rearrange(x_start, "b c f h w -> (b f) c h w")
-        t = rearrange(t, "b f -> (b f)")
-
-        posterior_mean = (
-                extract(self.posterior_mean_coef1, t, x_t.shape) * x_start +
-                extract(self.posterior_mean_coef2, t, x_t.shape) * x_t
-        )
-        posterior_variance = extract(self.posterior_variance, t, x_t.shape)
-        posterior_log_variance_clipped = extract(self.posterior_log_variance_clipped, t, x_t.shape)
-
-        posterior_mean = rearrange(posterior_mean, "(b f) c h w-> b c f h w ", f=self.num_frames)
-        posterior_variance = rearrange(posterior_variance, "(b f) c h w-> b c f h w ", f=self.num_frames)
-        posterior_log_variance_clipped = rearrange(posterior_log_variance_clipped, "(b f) c h w-> b c f h w ",
-                                                   f=self.num_frames)
-
-        return posterior_mean, posterior_variance, posterior_log_variance_clipped
-
     def p_mean_variance(self, x, x_lr, t, clip_denoised: bool, indexes=None, cond=None, cond_scale=1.):
 
         x_recon = self.denoise_fn.forward_with_cond_scale(torch.cat([x_lr, x], dim=1), t, indexes=indexes, cond=cond, cond_scale=cond_scale)
-            # self.predict_start_from_noise(x, t=t,
-            #                                     noise=self.denoise_fn.forward_with_cond_scale(torch.cat([x_lr, x], dim=1), t, indexes=indexes, cond=cond, cond_scale=cond_scale))
 
         if clip_denoised:
             s = 1.
@@ -694,7 +656,6 @@ class GaussianDiffusion(nn.Module):
                       unconditional_guidance_scale=1., unconditional_conditioning=None):
         b, *_, device = *x.shape, x.device
 
-        # pred_x0 = self.denoise_fn.forward_with_cond_scale(torch.cat([x_lr, x], dim=1), t, indexes=slice_id, cond=cond, cond_scale=1.0)
         x_recon = self.denoise_fn.forward_with_cond_scale(torch.cat([x_lr, x], dim=1), t, indexes=slice_id, cond=cond, cond_scale=1.0)
 
         # current prediction for x_0
@@ -766,22 +727,6 @@ class GaussianDiffusion(nn.Module):
         num_frames = self.num_frames
         return self.p_sample_loop((batch_size, channels, num_frames, image_size, image_size), cond=cond, img_lr=img_lr,
                                       cond_scale=cond_scale, use_ddim=DDIM)
-
-    @torch.inference_mode()
-    def interpolate(self, x1, x2, t=None, lam=0.5):
-        b, *_, device = *x1.shape, x1.device
-        t = default(t, self.num_timesteps - 1)
-
-        assert x1.shape == x2.shape
-
-        t_batched = torch.stack([torch.tensor(t, device=device)] * b)
-        xt1, xt2 = map(lambda x: self.q_sample(x, t=t_batched), (x1, x2))
-
-        img = (1 - lam) * xt1 + lam * xt2
-        for i in tqdm(reversed(range(0, t)), desc='interpolation sample time step', total=t):
-            img = self.p_sample(img, torch.full((b,), i, device=device, dtype=torch.long))
-
-        return img
 
 
 # trainer class
