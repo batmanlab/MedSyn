@@ -1,6 +1,6 @@
-import math
+
 import copy
-import torch
+
 import numpy as np
 from torch import nn, einsum
 import torch.nn.functional as F
@@ -9,152 +9,22 @@ from functools import partial
 from torch.utils import data
 from pathlib import Path
 from torch.optim import AdamW
-from torchvision import transforms as T, utils
-from torch.cuda.amp import autocast, GradScaler
+from torchvision import transforms as T
 from PIL import Image
 
 from tqdm import tqdm
 from einops import rearrange
 from dataloader import cache_transformed_text
-import glob, os
+import os
 from einops_exts import check_shape, rearrange_many
-
-from rotary_embedding_torch import RotaryEmbedding
 
 from text import tokenize, bert_embed, BERT_MODEL_DIM
 
 from accelerate import Accelerator
-from accelerate.logging import get_logger
-from accelerate.utils import set_seed
-import accelerate
-from diffusers import DDIMScheduler, DDPMScheduler
 
 import xformers, xformers.ops
 
-
-def get_alpha_cum(t):
-    return torch.where(t >= 0, torch.cos((t + 0.008) / 1.008 * math.pi / 2).clamp(min=0.0, max=1.0)**2, 1.0)
-
-def get_z_t(x_0, t):
-    alpha_cum = get_alpha_cum(t)[:, None, None, None, None]
-    eps = torch.randn_like(x_0)
-    x_t = torch.sqrt(alpha_cum)*x_0 + torch.sqrt(1-alpha_cum)*eps
-    return x_t, eps
-
-def get_eps_x_t(x_0, x_t, t):
-    alpha_cum = get_alpha_cum(t)[:, None, None, None, None]
-    eps = (x_t - torch.sqrt(alpha_cum)*x_0)/torch.sqrt(1-alpha_cum)
-    return eps
-
-def get_z_t_(x_0, t):
-    alpha_cum = get_alpha_cum(t)[:,None]
-    return torch.sqrt(alpha_cum)*x_0, torch.sqrt(1-alpha_cum)
-
-def get_z_t_via_z_tp1(x_0, z_tp1, t, t_p1):
-    alpha_cum = get_alpha_cum(t)[:, None, None, None, None]
-    alpha_cum_p1 = get_alpha_cum(t_p1)[:, None, None, None, None]
-    beta_p1 = 1 - alpha_cum_p1/alpha_cum
-    mean_0 = torch.sqrt(alpha_cum)*beta_p1/(1-alpha_cum_p1)
-    mean_tp1 = torch.sqrt(1-beta_p1)*(1-alpha_cum)/(1-alpha_cum_p1)
-
-    var = (1-alpha_cum)/(1-alpha_cum_p1)*beta_p1
-
-    return mean_0*x_0 + mean_tp1*z_tp1, var
-
-def ddim_sample(x_0, z_tp1, t, t_p1):
-    epsilon = get_eps_x_t(x_0, z_tp1, t_p1)
-    alpha_cum = get_alpha_cum(t)[:, None, None, None, None]
-    x_t = torch.sqrt(alpha_cum)*x_0 + torch.sqrt(1-alpha_cum)*epsilon
-    return x_t
-
-def make_ddim_sampling_parameters(alphacums, ddim_timesteps, eta, verbose=True):
-    # select alphas for computing the variance schedule
-    alphas = alphacums[ddim_timesteps]
-    alphas_prev = np.asarray([alphacums[0]] + alphacums[ddim_timesteps[:-1]].tolist())
-
-    # according the the formula provided in https://arxiv.org/abs/2010.02502
-    sigmas = eta * np.sqrt((1 - alphas_prev) / (1 - alphas) * (1 - alphas / alphas_prev))
-    if verbose:
-        print(f'Selected alphas for ddim sampler: a_t: {alphas}; a_(t-1): {alphas_prev}')
-        print(f'For the chosen value of eta, which is {eta}, '
-              f'this results in the following sigma_t schedule for ddim sampler {sigmas}')
-    return sigmas, alphas, alphas_prev
-
-def make_ddim_timesteps(ddim_discr_method, num_ddim_timesteps, num_ddpm_timesteps, verbose=True):
-    if ddim_discr_method == 'uniform':
-        c = num_ddpm_timesteps // num_ddim_timesteps
-        ddim_timesteps = np.asarray(list(range(0, num_ddpm_timesteps, c)))
-    elif ddim_discr_method == 'quad':
-        ddim_timesteps = ((np.linspace(0, np.sqrt(num_ddpm_timesteps * .8), num_ddim_timesteps)) ** 2).astype(int)
-    else:
-        raise NotImplementedError(f'There is no ddim discretization method called "{ddim_discr_method}"')
-
-    # assert ddim_timesteps.shape[0] == num_ddim_timesteps
-    # add one to get the final alpha values right (the ones from first scale to data during sampling)
-    steps_out = ddim_timesteps + 1
-    if verbose:
-        print(f'Selected timesteps for ddim sampler: {steps_out}')
-    return steps_out
-
-
-# helpers functions
-
-def exists(x):
-    return x is not None
-
-
-def noop(*args, **kwargs):
-    pass
-
-
-def is_odd(n):
-    return (n % 2) == 1
-
-
-def default(val, d):
-    if exists(val):
-        return val
-    return d() if callable(d) else d
-
-
-def cycle(dl):
-    while True:
-        for data in dl:
-            yield data
-
-
-def create_custom_forward(module, return_dict=None):
-    def custom_forward(*inputs):
-        if return_dict is not None:
-            return module(*inputs, return_dict=return_dict)
-        else:
-            return module(*inputs)
-
-    return custom_forward
-
-def num_to_groups(num, divisor):
-    groups = num // divisor
-    remainder = num % divisor
-    arr = [divisor] * groups
-    if remainder > 0:
-        arr.append(remainder)
-    return arr
-
-
-def prob_mask_like(shape, prob, device):
-    if prob == 1:
-        return torch.ones(shape, device=device, dtype=torch.bool)
-    elif prob == 0:
-        return torch.zeros(shape, device=device, dtype=torch.bool)
-    else:
-        return torch.zeros(shape, device=device).float().uniform_(0, 1) < prob
-
-
-def is_list_str(x):
-    if not isinstance(x, (list, tuple)):
-        return False
-    return all([type(el) == str for el in x])
-
+from utils import *
 
 # relative positional bias
 
