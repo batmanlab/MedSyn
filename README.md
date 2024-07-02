@@ -10,16 +10,21 @@ Official PyTorch implementation for paper *MedSyn: Text-guided Anatomy-aware Syn
 ## Table of Contents
 
 1. [Environment Setup](#environment-setup)
-2. [Pre-processing Data](#pre-processing-data)
-3. [Training](#training)
-4. [Inference](#inference)
-5. [Additional Scripts](#additional-scripts)
-6. [Generated Samples](#generated-samples)
-7. [Citation](#citation)
-8. [License and Copyright](#license-and-copyright)
-9. [Contact](#contact)
+2. [Pretrained Checkpoint](#pretrained-checkpoint)
+3. [Pre-processing Data](#pre-processing-data)
+4. [Training](#training)
+5. [Inference](#inference)
+6. [Additional Scripts](#additional-scripts)
+7. [Generated Samples](#generated-samples)
+8. [Citation](#citation)
+9. [License and Copyright](#license-and-copyright)
+10. [Contact](#contact)
 
 ## Environment Setup
+
+Refer to the `src` folder
+
+## Pretrained Checkpoint
 
 Refer to the `src` folder
 
@@ -37,6 +42,7 @@ Refer to the `src` folder
 
 ## Additional Scripts
 
+We give the inference for our text conditional generation in "prompt.ipynb" and the conditional generation with segmentation in "seg_conditional.ipynb"
 ## Generated Samples
 
 | Low-Res|  High-Res
