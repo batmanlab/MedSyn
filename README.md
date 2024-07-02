@@ -97,6 +97,8 @@ We give the inference for our text conditional generation in "prompt.ipynb" and 
 
 ## License and Copyright
 
+CC-BY-NC
+
 ## Contact
 Yanwu Xu [yanwuxu@bu.edu],
 Li Sun [lisun@bu.edu],
