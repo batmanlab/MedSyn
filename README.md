@@ -27,7 +27,7 @@ Refer to the `src` folder
 ```
 conda env create -f environment.yml
 ```
-In addition to this, you need also install several packages by:
+In addition to this, you need to also install several packages by:
 
 ```
 pip install monai==0.8.1
