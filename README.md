@@ -31,14 +31,13 @@ In addition to this, you need also install several packages by:
 
 ```
 pip install monai==0.8.1
-
 pip install accelerate
-
 pip install importlib_metadata
-
 pip install tqdm
-
 pip install einops
+pip install einops-exts
+pip install ninja
+conda install xformers -c xformers
 ```
 
 
