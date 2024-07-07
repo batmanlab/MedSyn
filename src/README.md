@@ -1,7 +1,3 @@
-# Create the MedSyn Conda environment
-```
-conda env create -f environment.yml
-```
 # Training of MedSyn
 This is a one-key running bash, which will run both low-res and high-res. But the training can be done independently
 ```bash
