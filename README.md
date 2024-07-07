@@ -22,22 +22,17 @@ Official PyTorch implementation for paper *MedSyn: Text-guided Anatomy-aware Syn
 
 ## Environment Setup
 
-Refer to the `src` folder 
-
 ```
-conda env create -f environment.yml
+conda create -n medsyn python==3.9
 ```
 In addition to this, you need to also install several packages by:
 
 ```
-pip install monai==0.8.1
+pip3 install -U xformers --index-url https://download.pytorch.org/whl/cu121
+pip install monai==0.8.0
 pip install accelerate
-pip install importlib_metadata
-pip install tqdm
 pip install einops
-pip install einops-exts
-pip install ninja
-conda install xformers -c xformers
+pip install einops_exts
 ```
 
 
