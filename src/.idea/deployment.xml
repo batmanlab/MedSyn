@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" autoUpload="Always" serverName="yanwuxu@bridges2.psc.edu:22 password" remoteFilesAllowedToDisappearOnAutoupload="false">
+    <serverData>
+      <paths name="yanwuxu@bridges2.psc.edu:22 password">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/ocean/projects/asc170022p/yanwuxu/diffusion/video-diffusion-pytorch/MedSyn/src" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
+  </component>
+</project>

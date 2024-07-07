@@ -18,13 +18,13 @@ from dataloader import cache_transformed_train_data
 import os
 from einops_exts import check_shape, rearrange_many
 
-from text import tokenize, bert_embed, BERT_MODEL_DIM
-
 from accelerate import Accelerator
 
 import xformers, xformers.ops
 
 from utils import *
+
+import argparse
 
 # relative positional bias
 
@@ -742,10 +742,6 @@ class GaussianDiffusion(nn.Module):
 
     @torch.inference_mode()
     def sample(self, cond=None, cond_scale=2., batch_size=16, DDIM=True):
-        device = next(self.denoise_fn.parameters()).device
-
-        if is_list_str(cond):
-            cond = bert_embed(tokenize(cond)).to(device)
 
         batch_size = cond.shape[0] if exists(cond) else batch_size
         image_size = self.image_size
@@ -754,19 +750,17 @@ class GaussianDiffusion(nn.Module):
         return self.p_sample_loop((batch_size, channels, num_frames, image_size, image_size), cond=cond,
                                       cond_scale=cond_scale, use_ddim=DDIM)
 
-    def p_losses(self, x_start, t, indexes=None, cond=None, noise=None, **kwargs):
+    def p_losses(self, x_start, t, indexes=None, cond=None, **kwargs):
         b, c, f, h, w, device = *x_start.shape, x_start.device
 
         x_noisy, noise = get_z_t(x_start, t)
 
         if is_list_str(cond):
-            cond = bert_embed(tokenize(cond), return_cls_repr=self.text_use_bert_cls)
             cond = cond.to(device)
 
         x_recon = self.denoise_fn(x_noisy, t*self.num_timesteps, indexes=indexes, cond=cond, **kwargs)
 
-        w = get_alpha_cum(t).sqrt()*10
-        loss = F.mse_loss(x_start*w, x_recon*w)
+        loss = F.mse_loss(x_start, x_recon)
 
         return loss
 
@@ -775,7 +769,6 @@ class GaussianDiffusion(nn.Module):
         check_shape(x, 'b c f h w', c=self.channels, f=self.num_frames, h=img_size, w=img_size)
         t = torch.rand((b), device=device).float()
         return self.p_losses(x, t, *args, **kwargs)
-
 
 # trainer class
 
@@ -884,9 +877,9 @@ class Trainer(object):
             self,
             diffusion_model,
             folder,
+            prompt_folder,
             *,
             ema_decay=0.995,
-            num_frames=16,
             train_batch_size=32,
             train_lr=1e-4,
             train_num_steps=100000,
@@ -901,7 +894,6 @@ class Trainer(object):
     ):
         super().__init__()
         self.model = diffusion_model
-        # self.model.load_state_dict(torch.load("results/model-17.pt")['model'], strict=False)
         self.ema = EMA(ema_decay)
         self.ema_model = copy.deepcopy(self.model)
         self.update_ema_every = update_ema_every
@@ -915,14 +907,13 @@ class Trainer(object):
         self.train_num_steps = train_num_steps
 
         image_size = diffusion_model.image_size
-        channels = diffusion_model.channels
         self.num_frames = diffusion_model.num_frames
 
         train_files = []
 
         for img_dir in os.listdir(folder):
             train_files.append({"image": os.path.join(folder, img_dir),
-                                'text': os.path.join("dir of prompt features",
+                                'text': os.path.join(prompt_folder,
                                                      img_dir)
                                 })
 
@@ -1017,7 +1008,6 @@ class Trainer(object):
                         grad_norm = self.accelerator.clip_grad_norm_(self.model.parameters(), self.max_grad_norm)
                         avg_loss = self.accelerator.gather(loss.repeat(self.batch_size)).mean()
                         print(f'{self.step}: {avg_loss},  {grad_norm}')
-                        log = {'loss': avg_loss, 'grad_norm': grad_norm}
 
                 self.opt.step()
                 self.opt.zero_grad()
@@ -1038,7 +1028,6 @@ class Trainer(object):
                             all_videos_list = list(
                                 map(lambda n: self.ema_model.module.sample(batch_size=n, cond=text), batches))
                             all_videos_list = torch.cat(all_videos_list, dim=0)
-                            # all_videos_list = (img+1.0)/2.0
                             all_videos_list, all_videos_list_lobe, all_videos_list_airway, all_videos_list_vessel = all_videos_list.chunk(4, dim=1)
                             all_videos_list = torch.cat([all_videos_list, all_videos_list_lobe, all_videos_list_airway, all_videos_list_vessel], dim=0)
 
@@ -1048,58 +1037,71 @@ class Trainer(object):
                                                 i=self.num_sample_rows)
                             video_path = str(self.results_folder / str(f'{str(milestone)}_{file_name}.gif'))
                             video_tensor_to_gif(one_gif, video_path)
-                            log = {**log, 'sample': video_path}
 
-                        # log_fn(log)
                         self.step += 1
 
         print('training completed')
 
 
-model = Unet3D(
-    dim=64,
-    cond_dim=768,
-    dim_mults=(2, 3, 6, 8),
-    channels=4,
-    attn_heads=8,
-    attn_dim_head=32,
-    use_bert_text_cond=False,
-    init_dim=None,
-    init_kernel_size=7,
-    use_sparse_linear_attn=True,
-    block_type='resnet',
-    resnet_groups=8
-)
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser('medsyn low-res args')
 
-diffusion_model = GaussianDiffusion(
-    denoise_fn=model,
-    image_size=64,
-    num_frames=64,
-    text_use_bert_cls=False,
-    channels=4,
-    timesteps=1000,
-    loss_type='x0',
-    use_dynamic_thres=False,  # from the Imagen paper
-    dynamic_thres_percentile=0.995,
-    volume_depth=64,
-    ddim_timesteps=50,
-)
+    parser.add_argument('--resume', action='store_true', default=False)
 
-trainer = Trainer(diffusion_model=diffusion_model,
-                  folder="Your Training DATA Path",
-                  ema_decay=0.999,
-                  num_frames=64,
-                  train_batch_size=1,
-                  train_lr=1e-4,
-                  train_num_steps=1000000,
-                  gradient_accumulate_every=4,
-                  amp=True,
-                  step_start_ema=10000,
-                  update_ema_every=1,
-                  save_and_sample_every=1000,
-                  results_folder='Your Logs Saving Path',
-                  num_sample_rows=1,
-                  max_grad_norm=1.0)
+    parser.add_argument('--data_dir', type=str, default="",
+                        help='Your Training DATA Path')
+    parser.add_argument('--prompt_dir', type=str, default="",
+                        help='Your Training DATA of Prompt Path')
+    parser.add_argument('--save_dir', type=str, default="",
+                        help='Your Logs Saving Path')
 
-# trainer.load(-1)
-trainer.train()
+    args = parser.parse_args()
+
+    model = Unet3D(
+        dim=64,
+        cond_dim=768,
+        dim_mults=(2, 3, 6, 8),
+        channels=4,
+        attn_heads=8,
+        attn_dim_head=32,
+        use_bert_text_cond=False,
+        init_dim=None,
+        init_kernel_size=7,
+        use_sparse_linear_attn=True,
+        block_type='resnet',
+        resnet_groups=8
+    )
+
+    diffusion_model = GaussianDiffusion(
+        denoise_fn=model,
+        image_size=64,
+        num_frames=64,
+        text_use_bert_cls=False,
+        channels=4,
+        timesteps=1000,
+        use_dynamic_thres=False,  # from the Imagen paper
+        dynamic_thres_percentile=0.995,
+        volume_depth=64,
+        ddim_timesteps=50,
+    )
+
+    trainer = Trainer(diffusion_model=diffusion_model,
+                      folder=args.data_dir,
+                      prompt_folder=args.prompt_dir,
+                      ema_decay=0.999,
+                      train_batch_size=1,
+                      train_lr=1e-4,
+                      train_num_steps=1000000,
+                      gradient_accumulate_every=4,
+                      amp=True,
+                      step_start_ema=10000,
+                      update_ema_every=1,
+                      save_and_sample_every=1000,
+                      results_folder=args.save_dir,
+                      num_sample_rows=1,
+                      max_grad_norm=1.0)
+
+    if args.resume:
+        trainer.load(-1)
+
+    trainer.train()

@@ -1,4 +1,4 @@
-name: DG_medical
+name: medsyn
 channels:
   - pytorch
   - nvidia
