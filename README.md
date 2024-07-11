@@ -40,6 +40,7 @@ pip install einops_exts
 
 Refer to the `src` folder
 
+Our checkpoint for pre-trained language model is available [here](https://www.dropbox.com/scl/fi/d6tg6si72nnjfa87vawsl/pretrained_lm.gz?rlkey=fcnyrmy1i3xi9frzjchc68kh3&st=gq6xofnh&dl=0).
 Our checkpoint for model pre-trained on UPMC dataset is available [here](https://drive.google.com/file/d/1AAlEN_dB7C0aVMJ81mKBlYnSqMVOk-tl/) (Application required).
 
 ## Pre-processing Data
@@ -59,7 +60,7 @@ sh run_train.sh
 
 Refer to the `src` folder
 
-`./extract_text_feature/extract_text_feature.ipynb`
+`sh run_inference.sh`
 
 ## Additional Scripts
 
@@ -70,8 +71,6 @@ We give the inference for our text conditional generation in "prompt.ipynb" and 
 :-------------------------:|:-------------------------:
 ![](figure/low_res/40004330_Reg.gif)  |  ![](figure/high_res/40004330_Reg.gif)
 ![](figure/low_res/40013558_Reg.gif)  |  ![](figure/high_res/40013558_Reg.gif)
-![](figure/low_res/40017881_Reg.gif)  |  ![](figure/high_res/40017881_Reg.gif)
-![](figure/low_res/40019171_Reg.gif)  |  ![](figure/high_res/40019171_Reg.gif)
 
 ### Comparisons
 

@@ -1,3 +1,5 @@
+# run vessel and lobe segmentation
+
 import argparse
 import os
 import glob

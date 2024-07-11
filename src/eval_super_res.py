@@ -1,3 +1,4 @@
+import argparse
 
 import SimpleITK as sitk
 import numpy as np
@@ -21,6 +22,9 @@ from text import tokenize, bert_embed, BERT_MODEL_DIM
 from accelerate import Accelerator
 
 from utils import *
+
+HIGH_THRESHOLD = 600
+LOW_THRESHOLD = -1024
 
 # relative positional bias
 
@@ -682,7 +686,7 @@ class GaussianDiffusion(nn.Module):
 
     @torch.inference_mode()
     def p_sample_loop(self, shape, cond=None, img_lr=None, cond_scale=1., use_ddim=True):
-        device = self.betas.device
+        device = torch.device('cuda')
 
         bsz = shape[0]
 
@@ -973,74 +977,96 @@ class Trainer(object):
                 save_nii(frames, output_dir=self.save_folder, output_postfix=str(f'{file_name}'))
                 #input_saver.save(frames)
 
-                frames_lobe = all_videos_list_lobe.squeeze().cpu().numpy()
-                save_nii(frames_lobe, output_dir=self.save_folder, output_postfix=str(f'{file_name}_lobe'))
-                #input_saver.save(frames_lobe)
-
-                frames_airway = all_videos_list_airway.squeeze().cpu().numpy()
-                save_nii(frames_airway, output_dir=self.save_folder, output_postfix=str(f'{file_name}_airway'))
-                #input_saver.save(frames_airway)
-
-                frames_vessel = all_videos_list_vessel.squeeze(dim=0).cpu().numpy()
-                save_nii(frames_vessel, output_dir=self.save_folder, output_postfix=str(f'{file_name}_vessel'))
-                #input_saver.save(frames_vessel)
-
-                #one_gif = rearrange(all_videos_list, '(i j) c f h w -> c f (i h) (j w)', i=self.num_sample_rows)
-                #video_path = os.path.join(self.results_folder, str(f'{file_name}.gif')).replace(".npy", "")
-                #video_tensor_to_gif(one_gif, video_path)
+                if args.save_mask:
+                    frames_lobe = all_videos_list_lobe.squeeze().cpu().numpy()
+                    save_mask_nii(frames_lobe, output_dir=self.save_folder, output_postfix=str(f'{file_name}_lobe'))
+                    #input_saver.save(frames_lobe)
+    
+                    frames_airway = all_videos_list_airway.squeeze().cpu().numpy()
+                    save_mask_nii(frames_airway, output_dir=self.save_folder, output_postfix=str(f'{file_name}_airway'))
+                    #input_saver.save(frames_airway)
+    
+                    frames_vessel = all_videos_list_vessel.squeeze(dim=0).cpu().numpy()
+                    save_mask_nii(frames_vessel, output_dir=self.save_folder, output_postfix=str(f'{file_name}_vessel'))
+                    #input_saver.save(frames_vessel)
+    
+                    #one_gif = rearrange(all_videos_list, '(i j) c f h w -> c f (i h) (j w)', i=self.num_sample_rows)
+                    #video_path = os.path.join(self.results_folder, str(f'{file_name}.gif')).replace(".npy", "")
+                    #video_tensor_to_gif(one_gif, video_path)
 
 def save_nii(img, output_dir, output_postfix):
+    img[img>1]=1
+    img[img<-1]=-1
+
+    img = np.flip(img, 1)
+    img = img*(HIGH_THRESHOLD-LOW_THRESHOLD) + LOW_THRESHOLD
+    
+    img = sitk.GetImageFromArray(img.astype(np.int16))
+    sitk.WriteImage(img, os.path.join(output_dir, output_postfix+".nii.gz"))
+
+def save_mask_nii(img, output_dir, output_postfix):
     img = sitk.GetImageFromArray(img)
     sitk.WriteImage(img, os.path.join(output_dir, output_postfix+".nii.gz"))
 
-model = Unet3D(
-    dim=56,
-    cond_dim=768,
-    dim_mults=(1, 2, 4, 8),
-    channels=4,
-    attn_heads=4,
-    attn_dim_head=32,
-    use_bert_text_cond=False,
-    init_dim=None,
-    init_kernel_size=7,
-    use_sparse_linear_attn=False,
-    block_type='resnet',
-    resnet_groups=8
-)
+def main(args):
+    model = Unet3D(
+        dim=56,
+        cond_dim=768,
+        dim_mults=(1, 2, 4, 8),
+        channels=4,
+        attn_heads=4,
+        attn_dim_head=32,
+        use_bert_text_cond=False,
+        init_dim=None,
+        init_kernel_size=7,
+        use_sparse_linear_attn=False,
+        block_type='resnet',
+        resnet_groups=8
+    )
+    
+    # total_params = sum(p.numel() for p in model.parameters())
+    # print(f"Number of parameters: {total_params}")
+    
+    diffusion_model = GaussianDiffusion(
+        denoise_fn=model,
+        image_size=256,
+        num_frames=256,
+        text_use_bert_cls=False,
+        channels=4,
+        timesteps=1000,
+        loss_type='l2',
+        use_dynamic_thres=False,  # from the Imagen paper
+        dynamic_thres_percentile=0.995,
+        volume_depth=256,
+        ddim_timesteps=20,
+    )
+    
+    trainer = Trainer(diffusion_model=diffusion_model,
+                      folder=args.low_res_folder,
+                      ema_decay=0.995,
+                      num_frames=64,
+                      train_batch_size=1,
+                      train_lr=1e-4,
+                      train_num_steps=1000000,
+                      gradient_accumulate_every=2,
+                      amp=False,
+                      step_start_ema=10000,
+                      update_ema_every=10,
+                      save_and_sample_every=1000,
+                      results_folder=args.pretrain_model_path,
+                      save_folder=args.save_path,
+                      num_sample_rows=1,
+                      max_grad_norm=1.0)
+    
+    trainer.load(-1)
+    trainer.train()
 
-total_params = sum(p.numel() for p in model.parameters())
-print(f"Number of parameters: {total_params}")
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--low_res_folder', type=str)
+    parser.add_argument('--pretrain_model_path', type=str)
+    parser.add_argument('--save_path', type=str)
+    parser.add_argument('--save_mask', action='store_true')
+    args = parser.parse_args()
 
-diffusion_model = GaussianDiffusion(
-    denoise_fn=model,
-    image_size=256,
-    num_frames=256,
-    text_use_bert_cls=False,
-    channels=4,
-    timesteps=1000,
-    loss_type='l2',
-    use_dynamic_thres=False,  # from the Imagen paper
-    dynamic_thres_percentile=0.995,
-    volume_depth=256,
-    ddim_timesteps=20,
-)
-
-trainer = Trainer(diffusion_model=diffusion_model,
-                  folder="Your Path of Saving Low-Res Volume",
-                  ema_decay=0.995,
-                  num_frames=64,
-                  train_batch_size=1,
-                  train_lr=1e-4,
-                  train_num_steps=1000000,
-                  gradient_accumulate_every=2,
-                  amp=False,
-                  step_start_ema=10000,
-                  update_ema_every=10,
-                  save_and_sample_every=1000,
-                  results_folder='Your Path of Saving high-res Logs',
-                  save_folder='Your Path of Saving final high-res Imgs',
-                  num_sample_rows=1,
-                  max_grad_norm=1.0)
-
-trainer.load(-1)
-trainer.train()
+    main(args)

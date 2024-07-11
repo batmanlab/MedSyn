@@ -1,4 +1,4 @@
-
+import argparse
 import copy
 
 import numpy as np
@@ -684,7 +684,7 @@ class GaussianDiffusion(nn.Module):
 
     @torch.inference_mode()
     def p_sample_loop(self, shape, cond=None, cond_scale=1., use_ddim=True):
-        device = self.betas.device
+        device = torch.device('cuda')
 
         bsz = shape[0]
 
@@ -1014,56 +1014,66 @@ class Trainer(object):
                 #video_path = os.path.join(self.results_folder, str(f'{file_name}.gif')).replace(".npy", "")
                 #video_tensor_to_gif(one_gif, video_path)
 
+def main(args):
+    
+    model = Unet3D(
+        dim=160,
+        cond_dim=768,
+        dim_mults=(1, 2, 4, 8),
+        channels=4,
+        attn_heads=8,
+        attn_dim_head=32,
+        use_bert_text_cond=False,
+        init_dim=None,
+        init_kernel_size=7,
+        use_sparse_linear_attn=True,
+        block_type='resnet',
+        resnet_groups=8
+    )
+    
+    # total_params = sum(p.numel() for p in model.parameters())
+    # print(f"Number of parameters: {total_params}")
+    
+    diffusion_model = GaussianDiffusion(
+        denoise_fn=model,
+        image_size=64,
+        num_frames=64,
+        text_use_bert_cls=False,
+        channels=4,
+        timesteps=1000,
+        loss_type='l2',
+        use_dynamic_thres=False,  # from the Imagen paper
+        dynamic_thres_percentile=0.995,
+        volume_depth=64,
+        ddim_timesteps=50,
+    )
+    
+    trainer = Trainer(diffusion_model=diffusion_model,
+                      folder=args.text_feature_folder,
+                      ema_decay=0.995,
+                      num_frames=64,
+                      train_batch_size=1,
+                      train_lr=1e-4,
+                      train_num_steps=1000000,
+                      gradient_accumulate_every=4,
+                      amp=True,
+                      step_start_ema=10000,
+                      update_ema_every=10,
+                      save_and_sample_every=1000,
+                      results_folder=args.pretrain_model_path,
+                      save_folder=args.save_path,
+                      num_sample_rows=1,
+                      num_sample=1,
+                      max_grad_norm=1.0)
+    
+    trainer.load(-1)
+    trainer.train()
 
-model = Unet3D(
-    dim=160,
-    cond_dim=768,
-    dim_mults=(1, 2, 4, 8),
-    channels=4,
-    attn_heads=8,
-    attn_dim_head=32,
-    use_bert_text_cond=False,
-    init_dim=None,
-    init_kernel_size=7,
-    use_sparse_linear_attn=True,
-    block_type='resnet',
-    resnet_groups=8
-)
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--text_feature_folder', type=str)
+    parser.add_argument('--pretrain_model_path', type=str)
+    parser.add_argument('--save_path', type=str)
+    args = parser.parse_args()
 
-total_params = sum(p.numel() for p in model.parameters())
-print(f"Number of parameters: {total_params}")
-
-diffusion_model = GaussianDiffusion(
-    denoise_fn=model,
-    image_size=64,
-    num_frames=64,
-    text_use_bert_cls=False,
-    channels=4,
-    timesteps=1000,
-    loss_type='l2',
-    use_dynamic_thres=False,  # from the Imagen paper
-    dynamic_thres_percentile=0.995,
-    volume_depth=64,
-    ddim_timesteps=50,
-)
-
-trainer = Trainer(diffusion_model=diffusion_model,
-                  folder="Your Text embedding Path",
-                  ema_decay=0.995,
-                  num_frames=64,
-                  train_batch_size=1,
-                  train_lr=1e-4,
-                  train_num_steps=1000000,
-                  gradient_accumulate_every=4,
-                  amp=True,
-                  step_start_ema=10000,
-                  update_ema_every=10,
-                  save_and_sample_every=1000,
-                  results_folder='Your Path of Saving the low-res logs',
-                  save_folder='Your Path of Saving the Imgs',
-                  num_sample_rows=1,
-                  num_sample=1,
-                  max_grad_norm=1.0)
-
-trainer.load(-1)
-trainer.train()
+    main(args)

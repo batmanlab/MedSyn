@@ -1,8 +1,10 @@
 # Pre-process Data for training MedSyn
 
-The data preprocessing pipeline consists of six steps, listed as following:
 
-### Step 1: Segment lung from CT scans, because we use lung mask for registration
+The data preprocessing pipeline is composed of five steps, which are as follows:
+
+
+### Step 1: Lung Segmentation from CT Scans for Registration Purposes
 
 ```bash
 python 1_seg_lung.py --img_folder path_to/
@@ -26,23 +28,18 @@ We use [ANTs](https://stnava.github.io/ANTs/) for image registration, please ins
 python 3_transform_image.py
 ```
 
-### Step 4: Run vessel segmentation
+### Step 4: Run vessel and lobe segmentation
 
 ```bash
 python 4_run_vessel_seg.py
 ```
 
-We use [TotalSegmentator](https://github.com/wasserth/TotalSegmentator) for vessel segmentation, please install it.
+We use [TotalSegmentator](https://github.com/wasserth/TotalSegmentator) for vessel and lobe segmentation, please install it.
 
-### Step 5:  Apply registration transform to lung masks
 
-```bash
-python 5_transform_lung_mask.py
-```
-
-### Step 6:  Run airway segmentation
+### Step 5:  Run airway segmentation
 
 ```bash
-sh 6_run_airway_segment.sh
+sh 5_run_airway_segment.sh
 ```
 We use [NaviAirway](https://github.com/AntonotnaWang/NaviAirway) for airway segmentation, please install it.
