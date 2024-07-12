@@ -1058,9 +1058,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     model = Unet3D(
-        dim=64,
+        dim=160,
         cond_dim=768,
-        dim_mults=(2, 3, 6, 8),
+        dim_mults=(1, 2, 4, 8),
         channels=4,
         attn_heads=8,
         attn_dim_head=32,
