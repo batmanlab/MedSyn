@@ -24,6 +24,8 @@ This code is made by This repository is by [Yanwu Xu](http://xuyanwu.github.io) 
 
 ## Environment Setup
 
+Before running and doing inference based on our code, we highly recommend preparing at least two GPUs with 48G GPU memory each.
+
 ```
 conda create -n medsyn python==3.9
 ```
