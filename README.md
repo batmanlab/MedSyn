@@ -1,7 +1,7 @@
 # MedSyn
 Official PyTorch implementation for paper *MedSyn: Text-guided Anatomy-aware Synthesis of High-Fidelity 3D CT Images*, accepted by *IEEE Transactions on Medical Imaging*.
 
-This code is made by This repository is by [Yanwu Xu](http://xuyanwu.github.io) and [Li Sun](https://lisun-ai.github.io/).
+This code is made by [Yanwu Xu](http://xuyanwu.github.io) and [Li Sun](https://lisun-ai.github.io/).
 
 ### [[Paper](https://arxiv.org/abs/2310.03559)] [[Project](https://batmanlab.github.io/medsyn.github.io/)]
 
