@@ -1,3 +1,10 @@
+[![MedSynV2](https://img.shields.io/badge/NEW%20VERSION-Please%20use%20MedSynV2-red?style=for-the-badge)](https://github.com/batmanlab/MedSynV2)
+
+### 🚨 We recommend using [MedSynV2](https://github.com/batmanlab/MedSynV2), our latest work, for new research and applications!
+
+---
+
+
 # MedSyn
 Official PyTorch implementation for paper *MedSyn: Text-guided Anatomy-aware Synthesis of High-Fidelity 3D CT Images*, accepted by *IEEE Transactions on Medical Imaging*.
 
