@@ -45,7 +45,7 @@ pip install einops_exts
 Refer to the `src` folder
 
 Our checkpoint for pre-trained language model is available [here](https://www.dropbox.com/scl/fi/d6tg6si72nnjfa87vawsl/pretrained_lm.gz?rlkey=fcnyrmy1i3xi9frzjchc68kh3&st=gq6xofnh&dl=0).
-Our checkpoint for model pre-trained on UPMC dataset is available [here](https://drive.google.com/file/d/1AAlEN_dB7C0aVMJ81mKBlYnSqMVOk-tl/) (Application required).
+Our checkpoint for model pre-trained on UPMC dataset is available [here](https://huggingface.co/batmanLab/MedSyn) (Application required).
 
 ## Pre-processing Data
 
